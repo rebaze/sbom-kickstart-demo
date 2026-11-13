@@ -1,0 +1,74 @@
+# The path the SBOM Kickstart sets up, on a demo product: the build writes the SBOM,
+# the SBOM is checked against BSI TR-03183-2, and the policy gate stops the build
+# when a rule with state FAIL is violated.
+#
+# main builds release 2016.4 and passes. The branch hotfix/2016.4.1 pulls in
+# log4j-core 2.14.1 (Log4Shell) and is stopped by the gate.
+name: Release
+
+on:
+  push:
+    branches: [main, "hotfix/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Build, SBOM, policy gate
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ github.ref_name == 'main' && '2016.4' || '2016.4.1-hotfix' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build the product and its SBOM
+        working-directory: partner-portal
+        run: mvn -B -q package
+
+      - name: Install sbomqs 2.0.8
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/sbomqs.tgz" https://github.com/interlynk-io/sbomqs/releases/download/v2.0.8/sbomqs_2.0.8_Linux_x86_64.tar.gz
+          echo "c8853906556245fe80f6ecea6015c057736701a1f763a1274ba5326b29fe1a5b  $RUNNER_TEMP/sbomqs.tgz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/sbomqs"
+          tar -xzf "$RUNNER_TEMP/sbomqs.tgz" -C "$RUNNER_TEMP/sbomqs" sbomqs
+          echo "$RUNNER_TEMP/sbomqs" >> "$GITHUB_PATH"
+
+      # Reported, not enforced: the list of missing required fields is the work plan for the SBOM.
+      - name: Check the SBOM against BSI TR-03183-2 v2.1
+        run: |
+          sbomqs compliance --bsi-v21 --json partner-portal/target/bom.json | sed -n '/^{/,$p' > "$RUNNER_TEMP/bsi.json"
+          {
+            echo "### SBOM: $(jq '.components | length' partner-portal/target/bom.json) components, BSI TR-03183-2 v2.1 required fields $(jq '.summary.required_elements_score * 10 | round / 10' "$RUNNER_TEMP/bsi.json") / 10"
+            echo
+            echo "| Required field | Present |"
+            echo "|---|---|"
+            jq -r '[.sections[] | select(.required)] | group_by(.section_data_field)
+              | map({f: .[0].section_data_field, ok: (map(select(.score >= 10)) | length), n: length})
+              | .[] | "| \(.f) | \(.ok) of \(.n) |"' "$RUNNER_TEMP/bsi.json"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Archive the SBOM with the release
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sbom-${{ env.VERSION }}
+          path: partner-portal/target/bom.json
+          retention-days: 90   # a demo; the SBOM of record is kept for ten years with the technical documentation
+
+      - name: Policy gate
+        env:
+          DT_URL: https://dependencytrack.rebaze.de
+          DT_API_KEY: ${{ secrets.DT_API_KEY }}
+        run: >
+          python3 scripts/gate.py partner-portal/target/bom.json "Partner Portal backend" "$VERSION"
+          --parent "Vulnerable showcase"
+          --tags owner:team-storefront,cra-product:partner-portal,cra-scope:in,ci

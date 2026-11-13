@@ -1,0 +1,9 @@
+{
+  "_comment": "Why each rule exists. The rules themselves live in Dependency-Track; the gate prints the source next to every violation.",
+  "Known exploited or likely exploited": "CRA Art. 13(5): due diligence for third-party components",
+  "No Log4Shell, Spring4Shell or Struts RCE": "House rule: named vulnerabilities never ship",
+  "Critical vulnerabilities": "CRA Art. 13(5): due diligence for third-party components",
+  "End of life (endoflife.date)": "CRA Art. 13(5): the component no longer receives security updates",
+  "Components older than four years": "OWASP Top 10:2025 A03: choose versions deliberately",
+  "Legal: no license information": "Licence policy"
+}
