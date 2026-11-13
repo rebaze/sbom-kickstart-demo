@@ -1,0 +1,22 @@
+{
+  "product": "Partner Portal",
+  "release": "2016.4",
+  "date": "2026-11-13",
+  "note": "Beispiel. Produkt, Stände und Aufwände sind erfunden; die Belege verweisen auf dieses Repository.",
+  "rows": [
+    {"pflicht": "SBOM je Release", "fundstelle": "CRA Anhang I Teil II Nr. 1", "stand": "belegt",
+     "beleg": "SBOM aus dem Build, Workflow Release", "schritt": "", "aufwand": 0},
+    {"pflicht": "SBOM in der technischen Dokumentation", "fundstelle": "CRA Anhang VII Nr. 2 Buchst. b", "stand": "offen",
+     "beleg": "", "schritt": "Ablage und Aufbewahrung festlegen", "aufwand": 2},
+    {"pflicht": "Schwachstellen unverzüglich behandeln", "fundstelle": "CRA Anhang I Teil II Nr. 2", "stand": "teilweise",
+     "beleg": "Routing-Tabelle, Drill vom 13.11.2026", "schritt": "Fristen je Schweregrad beschließen", "aufwand": 3},
+    {"pflicht": "Aktiv ausgenutzte Schwachstellen melden", "fundstelle": "CRA Art. 14 Abs. 1 und 2", "stand": "offen",
+     "beleg": "", "schritt": "Meldeweg und Vertretung benennen", "aufwand": 3},
+    {"pflicht": "Sorgfalt bei Third-Party-Komponenten", "fundstelle": "CRA Art. 13 Abs. 5", "stand": "teilweise",
+     "beleg": "Policy Gate im Build, 2 Regeln mit FAIL", "schritt": "Weitere Regeln auf FAIL stellen", "aufwand": 2},
+    {"pflicht": "Schwachstelle an den Maintainer melden", "fundstelle": "CRA Art. 13 Abs. 6", "stand": "offen",
+     "beleg": "", "schritt": "Ablauf festlegen", "aufwand": 1},
+    {"pflicht": "Unterstützungszeitraum festlegen", "fundstelle": "CRA Art. 13 Abs. 8", "stand": "offen",
+     "beleg": "", "schritt": "Entscheidung der Leitung", "aufwand": null}
+  ]
+}
