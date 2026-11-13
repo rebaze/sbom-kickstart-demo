@@ -7,7 +7,7 @@
        Illustrative; it belongs to no customer. -->
   <groupId>demo.portal</groupId>
   <artifactId>partner-portal-backend</artifactId>
-  <version>2016.4</version>
+  <version>2016.4.1-hotfix</version>
   <packaging>jar</packaging>
   <name>Partner Portal backend</name>
   <description>Demo product of the SBOM Kickstart: order intake for a partner portal.</description>
@@ -28,7 +28,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- The release uses a maintained Log4j. The branch hotfix/2016.4.1 sets 2.14.1 (Log4Shell)
          to show the policy gate. -->
-    <log4j.version>2.25.2</log4j.version>
+    <log4j.version>2.14.1</log4j.version>
   </properties>
 
   <dependencies>
